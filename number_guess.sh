@@ -2,8 +2,6 @@
 
 PSQL="psql -X --username=freecodecamp --dbname=number_guess --tuples-only --no-align -c"
 
-echo $(( $RANDOM % 1000 + 1 ))
-
 echo -e "\nEnter your username:\n"
 read USERNAME
 
@@ -23,5 +21,8 @@ else
 
 fi
 
+# START PLAYING
 echo -e "\nGuess the secret number between 1 and 1000:"
 read GUSSE
+
+echo $(( $RANDOM % 1000 + 1 ))
