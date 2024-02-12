@@ -15,8 +15,8 @@ then
 
 else
   # IF PLAYED BEFORE
-  GAMES_PLAYED=$($PSQL"SELECT COUNT(*) FROM games INNER JOIN USEING(user_id) WHERE user_name='$USERNAME'")
-  BEST_GAME=$($PSQL"SELECT MIN(gusses) FROM games INNER JOIN USEING(user_id) WHERE user_name='$USERNAME'")
+  GAMES_PLAYED=$($PSQL "SELECT COUNT(*) FROM games INNER JOIN users USEING(user_id) WHERE user_name='$USERNAME'")
+  BEST_GAME=$($PSQL "SELECT MIN(gusses) FROM games INNER JOIN users USEING(user_id) WHERE user_name='$USERNAME'")
 
   echo "Welcome back, $USERNAME! You have played $PLAYED_GAMES games, and your best game took $GAMES_PLAYED guesses."
 
@@ -26,26 +26,35 @@ fi
 echo -e "\nGuess the secret number between 1 and 1000:"
 read GUSSE
 
+# NUMBER OF TRIES 
+$TRIES=1
+
 # IF GUSSE NOT NUMBER
 if [[ ! $GUSSE =~ ^[0-9]+$ ]]
 then
   echo "That is not an integer, guess again:"
-
-else
-  # IF GUSSE GRATER THEN NUMBER
-  if [[ $GUSSE -gt $SECRET_NUMBER ]]
-  then 
-    echo "It's higher than that, guess again:"
-
-  # IF GUSSE LESS THEN NUMBER
-  elif [[ $GUSSE -lt $SECRET_NUMBER ]]
-  then
-    echo "It's lower than that, guess again:"
-
-  else
-  # THE CORRECT GUSSE
-  echo "You guessed it in <number_of_guesses> tries. The secret number was $SECRET_NUMBER. Nice job!"
+  read GUSSE
   
-  fi
+else
+  while [ ! $GUSSE -eq $SECRET_NUMBER ]
+  do
+    TRIES=$(expr $TRIES + 1)
+
+    # IF GUSSE GRATER THEN NUMBER
+    if [[ $GUSSE -lt $SECRET_NUMBER ]]
+    then 
+      echo "It's higher than that, guess again:"
+      read GUSSE
+
+    # IF GUSSE LESS THEN NUMBER
+    elif [[ $GUSSE -gt $SECRET_NUMBER ]]
+    then
+      echo "It's lower than that, guess again:"
+      read GUSSE
+
+    fi
+  done  
 fi
 
+# THE CORRECT GUSSE
+echo "You guessed it in $TRIES tries. The secret number was $SECRET_NUMBER. Nice job!"
